@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reel recorder — wedding invitation websites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Italiana&family=Jost:wght@300;400;500&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#d4af6a; --gold-lt:#f6e5b8; --cream:#f3ece0;
+  --grad:linear-gradient(115deg,#8f6b2e,#f6e5b8 32%,#d4af6a 52%,#f6e5b8 70%,#8f6b2e);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#050407;overflow:hidden}
+body{display:grid;place-items:center;font-family:"Jost",sans-serif}
+
+/* the 1080x1920 stage, scaled to fit whatever window you record in */
+#stage{
+  position:relative;width:1080px;height:1920px;transform-origin:center center;
+  background:radial-gradient(80% 50% at 50% 0%,#241a30,transparent 60%),#0b090e;
+  overflow:hidden;color:var(--cream);
+}
+#stage.is-idle #playHint{opacity:1}
+
+/* phone holding the live site */
+.phone{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:660px;height:1330px;border-radius:64px;padding:16px;
+  background:linear-gradient(160deg,#4a4054,#17121f 40%,#0d0a12);
+  box-shadow:0 60px 120px -40px #000, 0 0 0 2px rgba(212,175,106,.35), inset 0 0 0 2px rgba(255,255,255,.06);
+  opacity:0;transition:opacity .8s var(--ease), transform .9s var(--ease);
+}
+.phone.is-on{opacity:1}
+.phone__screen{position:relative;width:100%;height:100%;border-radius:50px;overflow:hidden;background:#000}
+.phone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.phone__notch{
+  position:absolute;left:50%;top:26px;transform:translateX(-50%);
+  width:150px;height:26px;border-radius:999px;background:#0b0910;z-index:3;
+}
+
+/* opening / closing title cards */
+.card{
+  position:absolute;inset:0;display:grid;place-content:center;text-align:center;
+  padding:0 90px;gap:22px;opacity:0;pointer-events:none;
+  transition:opacity .7s var(--ease);
+  background:radial-gradient(70% 45% at 50% 40%,rgba(36,26,48,.9),#0b090e 75%);
+}
+.card.is-on{opacity:1}
+.card__kicker{font-size:26px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin:0}
+.card__big{
+  font-family:"Italiana",serif;font-size:118px;line-height:1.04;margin:0;
+  background:var(--grad);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:sh 6s linear infinite;
+}
+@keyframes sh{to{background-position:220% 0}}
+.card__sub{font-family:"Cormorant Garamond",serif;font-size:40px;line-height:1.5;color:rgba(243,236,224,.72);margin:0}
+.card__cta{
+  margin-top:14px;display:inline-flex;align-items:center;justify-content:center;
+  height:96px;padding:0 54px;border:2px solid rgba(212,175,106,.6);border-radius:999px;
+  font-size:26px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-lt);
+  justify-self:center;
+}
+[dir="rtl"] .card__kicker,[dir="rtl"] .card__cta{letter-spacing:normal}
+[dir="rtl"] .card__big{font-family:"Tajawal",sans-serif;font-size:96px;font-weight:700}
+[dir="rtl"] .card__sub{font-family:"Tajawal",sans-serif;font-size:38px}
+
+/* caption strip over the phone */
+.cap{
+  position:absolute;left:60px;right:60px;bottom:118px;z-index:5;text-align:center;
+  opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .5s var(--ease);
+}
+.cap.is-on{opacity:1;transform:none}
+.cap__t{
+  display:inline-block;padding:22px 38px;border-radius:22px;
+  background:rgba(8,6,12,.72);backdrop-filter:blur(10px);
+  border:1px solid rgba(212,175,106,.3);
+  font-size:40px;line-height:1.35;color:#fff;font-weight:400;
+}
+[dir="rtl"] .cap__t{font-family:"Tajawal",sans-serif}
+
+/* label of which design is showing */
+.badge{
+  position:absolute;left:50%;top:96px;transform:translateX(-50%);z-index:5;
+  padding:14px 34px;border-radius:999px;border:1px solid rgba(212,175,106,.4);
+  background:rgba(8,6,12,.6);backdrop-filter:blur(8px);
+  font-size:24px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);
+  opacity:0;transition:opacity .5s var(--ease);
+}
+.badge.is-on{opacity:1}
+[dir="rtl"] .badge{letter-spacing:normal;font-family:"Tajawal",sans-serif}
+
+/* progress + controls (never recorded — they sit outside the stage) */
+.bar{position:absolute;left:0;top:0;height:5px;width:0;background:var(--grad);z-index:9}
+#playHint{
+  position:absolute;inset:0;z-index:20;display:grid;place-content:center;gap:26px;text-align:center;
+  background:rgba(5,4,7,.92);opacity:0;transition:opacity .4s;pointer-events:none;
+}
+#stage.is-idle #playHint{pointer-events:auto}
+#playHint h2{font-family:"Italiana",serif;font-size:64px;margin:0;color:var(--gold-lt)}
+#playHint p{font-size:26px;color:rgba(243,236,224,.6);margin:0;line-height:1.6}
+#playBtn{
+  justify-self:center;margin-top:10px;height:104px;padding:0 60px;border:0;border-radius:999px;
+  background:var(--grad);color:#1a1220;font-size:28px;letter-spacing:.24em;text-transform:uppercase;
+  font-family:"Jost",sans-serif;cursor:pointer;
+}
+.tools{
+  position:fixed;left:16px;bottom:16px;z-index:50;display:flex;gap:8px;align-items:center;
+  font-size:13px;color:#8d859b;
+}
+.tools button,.tools a{
+  font:inherit;background:#1a1522;border:1px solid #322a3f;
+  border-radius:8px;padding:8px 12px;cursor:pointer;text-decoration:none;color:#c9bfd8;
+}
+.tools button:hover,.tools a:hover{border-color:var(--gold);color:var(--gold-lt)}
+@media (max-width:400px){ .tools{display:none} }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div class="bar" id="bar"></div>
+
+  <!-- opening card -->
+  <section class="card" id="cardIn">
+    <p class="card__kicker" id="inKicker">Wedding invitations</p>
+    <h1 class="card__big" id="inBig">Not paper.<br>A website.</h1>
+    <p class="card__sub" id="inSub">Opens like a gift. Counts down to the day.<br>Collects every reply.</p>
+  </section>
+
+  <!-- the phone -->
+  <div class="phone" id="phone">
+    <div class="phone__screen">
+      <div class="phone__notch"></div>
+      <iframe id="frame" title="demo" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <div class="badge" id="badge">Design 01</div>
+
+  <div class="cap" id="cap"><span class="cap__t" id="capText"></span></div>
+
+  <!-- closing card -->
+  <section class="card" id="cardOut">
+    <p class="card__kicker" id="outKicker">Your invitation, your way</p>
+    <h1 class="card__big" id="outBig">Three designs.</h1>
+    <p class="card__sub" id="outSub">Personalised for every guest by name.</p>
+    <span class="card__cta" id="outCta">Link in bio</span>
+  </section>
+
+  <div id="playHint">
+    <h2 id="hintTitle">Ready to record</h2>
+    <p id="hintBody">Start your screen recorder, then press play.<br>Runs about 32 seconds, then stops on the end card.</p>
+    <button id="playBtn">Play</button>
+  </div>
+</div>
+
+<div class="tools">
+  <button id="replay">Replay</button>
+  <a href="?lang=en">EN</a>
+  <a href="?lang=ar">عربي</a>
+  <span id="scaleNote"></span>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var q = new URLSearchParams(location.search);
+  var LANG = q.get('lang') === 'ar' ? 'ar' : 'en';
+  // where the three demos live; override with ?base=...
+  var BASE = q.get('base') || 'https://omarbalkis6-dotcom.github.io/wedding-invitations';
+
+  var COPY = {
+    en: {
+      dir: 'ltr',
+      inKicker: 'Wedding invitations',
+      inBig: 'Not paper.<br>A website.',
+      inSub: 'Opens like a gift. Counts down to the day.<br>Collects every reply.',
+      outKicker: 'Your invitation, your way',
+      outBig: 'Three designs.',
+      outSub: 'Personalised for every guest by name.',
+      outCta: 'Link in bio',
+      hintTitle: 'Ready to record',
+      hintBody: 'Start your screen recorder, then press play.<br>Runs about 32 seconds, then stops on the end card.',
+      badges: ['Design 01 · Midnight Gold', 'Design 02 · Blush Heart', 'Design 03 · Arabic Arch'],
+      caps: [
+        'It opens like a real envelope',
+        'A live countdown to the big day',
+        'Guests reply — and it reaches your phone',
+        'Every frame cut from a heart',
+        'Fully Arabic, right to left',
+        'Each guest greeted by name'
+      ]
+    },
+    ar: {
+      dir: 'rtl',
+      inKicker: 'دعوات الأفراح',
+      inBig: 'مش ورق.<br>موقع كامل.',
+      inSub: 'يفتح مثل الهدية، ويعدّ الأيام للفرح،<br>ويجمع ردود المدعوين.',
+      outKicker: 'دعوتك على ذوقك',
+      outBig: 'ثلاثة تصاميم.',
+      outSub: 'ولكل مدعو رابط باسمه.',
+      outCta: 'الرابط في البايو',
+      hintTitle: 'جاهز للتسجيل',
+      hintBody: 'شغّل تسجيل الشاشة، بعدين اضغط تشغيل.<br>المدة حوالي ٣٢ ثانية.',
+      badges: ['التصميم الأول', 'التصميم الثاني', 'التصميم الثالث · عربي'],
+      caps: [
+        'تفتح مثل المغلّف تماماً',
+        'عدّاد تنازلي لليوم الكبير',
+        'المدعو يؤكد حضوره — ويوصلك على واتساب',
+        'كل صورة مقصوصة على شكل قلب',
+        'عربية بالكامل، من اليمين لليسار',
+        'ولكل مدعو ترحيب باسمه'
+      ]
+    }
+  }[LANG];
+
+  var $ = function (s) { return document.querySelector(s); };
+  var stage = $('#stage'), phone = $('#phone'), frame = $('#frame');
+  var badge = $('#badge'), cap = $('#cap'), capText = $('#capText'), bar = $('#bar');
+
+  // ---- language into the DOM ----
+  document.documentElement.setAttribute('dir', COPY.dir);
+  $('#inKicker').textContent = COPY.inKicker;
+  $('#inBig').innerHTML      = COPY.inBig;
+  $('#inSub').innerHTML      = COPY.inSub;
+  $('#outKicker').textContent= COPY.outKicker;
+  $('#outBig').textContent   = COPY.outBig;
+  $('#outSub').textContent   = COPY.outSub;
+  $('#outCta').textContent   = COPY.outCta;
+  $('#hintTitle').textContent= COPY.hintTitle;
+  $('#hintBody').innerHTML   = COPY.hintBody;
+
+  // ---- fit the 1080x1920 stage into the window ----
+  function fit() {
+    var s = Math.min(window.innerWidth / 1080, window.innerHeight / 1920);
+    stage.style.transform = 'scale(' + s + ')';
+    $('#scaleNote').textContent = 'stage 1080×1920 at ' + Math.round(s * 100) + '%';
+  }
+  fit();
+  window.addEventListener('resize', fit);
+
+  // ---- the timeline (ms) ----
+  var SITES = ['midnight-gold', 'blush-heart', 'arabic-arch'];
+  var T = [
+    { at: 0,     do: function () { show('#cardIn'); } },
+    { at: 3400,  do: function () { hide('#cardIn'); load(0); } },
+    { at: 4200,  do: function () { phone.classList.add('is-on'); setBadge(0); } },
+    { at: 5200,  do: function () { setCap(0); } },
+    { at: 9000,  do: function () { setCap(1); } },
+    { at: 12500, do: function () { setCap(2); } },
+
+    { at: 15500, do: function () { swapTo(1); } },
+    { at: 17000, do: function () { setCap(3); } },
+
+    { at: 21500, do: function () { swapTo(2); } },
+    { at: 23000, do: function () { setCap(4); } },
+    { at: 26500, do: function () { setCap(5); } },
+
+    { at: 29500, do: function () { clearCap(); badge.classList.remove('is-on'); phone.classList.remove('is-on'); } },
+    { at: 30300, do: function () { show('#cardOut'); } },
+    { at: 32500, do: function () { finish(); } }
+  ];
+  var DURATION = 32500;
+
+  function show(sel) { $(sel).classList.add('is-on'); }
+  function hide(sel) { $(sel).classList.remove('is-on'); }
+  function setBadge(i) { badge.textContent = COPY.badges[i]; badge.classList.add('is-on'); }
+  function setCap(i) {
+    cap.classList.remove('is-on');
+    setTimeout(function () { capText.textContent = COPY.caps[i]; cap.classList.add('is-on'); }, 260);
+  }
+  function clearCap() { cap.classList.remove('is-on'); }
+
+  function load(i) {
+    // demo=1 opens the invitation and drifts down it with no hands
+    frame.src = BASE + '/' + SITES[i] + '/?demo=1&secs=13';
+  }
+  function swapTo(i) {
+    phone.classList.remove('is-on');
+    clearCap();
+    setTimeout(function () {
+      load(i);
+      setBadge(i);
+      phone.classList.add('is-on');
+    }, 700);
+  }
+
+  var timers = [], raf = null, running = false;
+  function finish() {
+    running = false;
+    bar.style.width = '100%';
+  }
+
+  function play() {
+    stop();
+    running = true;
+    stage.classList.remove('is-idle');
+    hide('#cardOut'); hide('#cardIn');
+    phone.classList.remove('is-on');
+    clearCap();
+    badge.classList.remove('is-on');
+
+    var t0 = performance.now();
+    T.forEach(function (step) {
+      timers.push(setTimeout(step.do, step.at));
+    });
+    (function tick(t) {
+      if (!running) return;
+      bar.style.width = Math.min(100, ((t - t0) / DURATION) * 100) + '%';
+      raf = requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  function stop() {
+    running = false;
+    timers.forEach(clearTimeout);
+    timers = [];
+    if (raf) cancelAnimationFrame(raf);
+    bar.style.width = '0';
+  }
+
+  stage.classList.add('is-idle');
+  $('#playBtn').addEventListener('click', function () {
+    $('#playHint').style.opacity = '0';
+    $('#playHint').style.pointerEvents = 'none';
+    stage.classList.remove('is-idle');
+    play();
+  });
+  $('#replay').addEventListener('click', function () {
+    frame.src = 'about:blank';
+    setTimeout(play, 200);
+  });
+
+  // expose for scripted checks
+  window.__reel = { play: play, stop: stop, timeline: T, duration: DURATION, lang: LANG, base: BASE };
+})();
+</script>
+</body>
+</html>

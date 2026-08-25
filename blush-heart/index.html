@@ -1679,6 +1679,45 @@ a{color:inherit; text-decoration:none}
     e.preventDefault();
     target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
   });
+
+  /* ---------------------------------------------------------------
+     Demo mode — ?demo=1
+     Opens the invitation and drifts down the page on its own, so it
+     can be screen-recorded hands-free. Add &secs=40 to slow it down.
+  --------------------------------------------------------------- */
+  (function demoMode() {
+    var q = new URLSearchParams(location.search);
+    if (q.get('demo') !== '1') return;
+
+    var secs = Math.max(8, Math.min(120, parseFloat(q.get('secs')) || 26));
+
+    // hide the scrollbar so it never shows up in a recording
+    var st = document.createElement('style');
+    // the sites set scroll-behavior:smooth; per-frame scrollTo would fight it
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    st.textContent = 'html{scrollbar-width:none}' +
+      'html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}';
+    document.head.appendChild(st);
+
+    setTimeout(function () { openInvitation(); }, 1400);
+
+    setTimeout(function () {
+      var start = null;
+      function maxScroll() {
+        return Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      }
+      function step(t) {
+        if (start === null) start = t;
+        var p = Math.min(1, (t - start) / (secs * 1000));
+        // ease-in-out so the drift starts and ends gently
+        var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        window.scrollTo(0, maxScroll() * e);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, 4200);
+  })();
 })();
 
 </script>
