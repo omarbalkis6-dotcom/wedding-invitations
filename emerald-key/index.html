@@ -190,7 +190,14 @@ a{color:inherit; text-decoration:none}
 @keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
 
 /* the box */
-.lockbox{position:relative; width:min(330px,84vw); margin:0 auto; perspective:1200px}
+.lockbox{
+  position:relative; width:min(330px,84vw); margin:0 auto; perspective:1200px;
+  /* the key scales with the screen so it never lands outside the gate */
+  --key-w:  clamp(132px, 40vw, 210px);
+  --key-h:  calc(var(--key-w) * 0.314);
+  --key-out: calc(var(--key-w) / 2 + 6vw);   /* resting, beside the lock   */
+  --key-in:  calc(var(--key-w) / 2 - 18px);  /* seated in the keyhole      */
+}
 .env{
   position:relative; aspect-ratio:1.5/1; transform-style:preserve-3d;
   filter:drop-shadow(0 30px 44px rgba(0,0,0,.6));
@@ -252,33 +259,34 @@ a{color:inherit; text-decoration:none}
 
 /* the key */
 .key{
-  position:absolute; left:50%; top:58%; z-index:7; padding:0; width:210px; height:66px;
-  transform:translate(calc(-50% + 190px),-50%) rotate(0deg);
+  position:absolute; left:50%; top:58%; z-index:7; padding:0;
+  width:var(--key-w); height:var(--key-h);
+  transform:translate(calc(-50% + var(--key-out)),-50%) rotate(0deg);
   filter:drop-shadow(0 8px 16px rgba(0,0,0,.6));
   transition:transform 1s var(--ease);
   animation:keyNudge 2.4s ease-in-out infinite;
 }
 .key svg{width:100%; height:100%; display:block}
 @keyframes keyNudge{
-  0%,100%{transform:translate(calc(-50% + 190px),-50%)}
-  50%{transform:translate(calc(-50% + 172px),-50%)}
+  0%,100%{transform:translate(calc(-50% + var(--key-out)),-50%)}
+  50%    {transform:translate(calc(-50% + var(--key-out) - 16px),-50%)}
 }
 /* 1 — slide in */
 .lockbox.is-inserting .key{
   animation:none;
-  transform:translate(calc(-50% + 74px),-50%);
+  transform:translate(calc(-50% + var(--key-in)),-50%);
 }
 /* 2 — turn */
 .lockbox.is-turning .key{
   animation:none;
-  transform:translate(calc(-50% + 74px),-50%) rotate(92deg);
+  transform:translate(calc(-50% + var(--key-in)),-50%) rotate(92deg);
   transition:transform .85s var(--back);
 }
 .lockbox.is-turning .plate{transform:translate(-50%,-50%) rotate(92deg) scale(1.06)}
 .lockbox.is-turning .plate__ring{animation:none; opacity:0}
 /* 3 — unlocked: key drops away, envelope opens */
 .lockbox.is-open .key{
-  transform:translate(calc(-50% + 74px),calc(-50% + 260px)) rotate(140deg);
+  transform:translate(calc(-50% + var(--key-in)),calc(-50% + 240px)) rotate(140deg);
   opacity:0; transition:transform 1s var(--ease), opacity .8s;
 }
 .lockbox.is-open .plate{transform:translate(-50%,-50%) rotate(92deg) scale(.4); opacity:0}
