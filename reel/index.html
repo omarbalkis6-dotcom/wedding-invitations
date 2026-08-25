@@ -152,7 +152,7 @@ body{display:grid;place-items:center;font-family:"Jost",sans-serif}
 
   <div id="playHint">
     <h2 id="hintTitle">Ready to record</h2>
-    <p id="hintBody">Start your screen recorder, then press play.<br>Runs about 32 seconds, then stops on the end card.</p>
+    <p id="hintBody">Start your screen recorder, then press play.<br>Runs about 38 seconds, then stops on the end card.</p>
     <button id="playBtn">Play</button>
   </div>
 </div>
@@ -179,19 +179,20 @@ body{display:grid;place-items:center;font-family:"Jost",sans-serif}
       inBig: 'Not paper.<br>A website.',
       inSub: 'Opens like a gift. Counts down to the day.<br>Collects every reply.',
       outKicker: 'Your invitation, your way',
-      outBig: 'Three designs.',
+      outBig: 'Four designs.',
       outSub: 'Personalised for every guest by name.',
       outCta: 'Link in bio',
       hintTitle: 'Ready to record',
       hintBody: 'Start your screen recorder, then press play.<br>Runs about 32 seconds, then stops on the end card.',
-      badges: ['Design 01 · Midnight Gold', 'Design 02 · Blush Heart', 'Design 03 · Arabic Arch'],
+      badges: ['Design 01 · Midnight Gold', 'Design 02 · Blush Heart', 'Design 03 · Arabic Arch', 'Design 04 · Emerald Key'],
       caps: [
         'It opens like a real envelope',
         'A live countdown to the big day',
         'Guests reply — and it reaches your phone',
         'Every frame cut from a heart',
         'Fully Arabic, right to left',
-        'Each guest greeted by name'
+        'Each guest greeted by name',
+        'And a golden key that unlocks it all'
       ]
     },
     ar: {
@@ -200,19 +201,20 @@ body{display:grid;place-items:center;font-family:"Jost",sans-serif}
       inBig: 'مش ورق.<br>موقع كامل.',
       inSub: 'يفتح مثل الهدية، ويعدّ الأيام للفرح،<br>ويجمع ردود المدعوين.',
       outKicker: 'دعوتك على ذوقك',
-      outBig: 'ثلاثة تصاميم.',
+      outBig: 'أربعة تصاميم.',
       outSub: 'ولكل مدعو رابط باسمه.',
       outCta: 'الرابط في البايو',
       hintTitle: 'جاهز للتسجيل',
-      hintBody: 'شغّل تسجيل الشاشة، بعدين اضغط تشغيل.<br>المدة حوالي ٣٢ ثانية.',
-      badges: ['التصميم الأول', 'التصميم الثاني', 'التصميم الثالث · عربي'],
+      hintBody: 'شغّل تسجيل الشاشة، بعدين اضغط تشغيل.<br>المدة حوالي ٣٨ ثانية.',
+      badges: ['التصميم الأول', 'التصميم الثاني', 'التصميم الثالث · عربي', 'التصميم الرابع · المفتاح'],
       caps: [
         'تفتح مثل المغلّف تماماً',
         'عدّاد تنازلي لليوم الكبير',
         'المدعو يؤكد حضوره — ويوصلك على واتساب',
         'كل صورة مقصوصة على شكل قلب',
         'عربية بالكامل، من اليمين لليسار',
-        'ولكل مدعو ترحيب باسمه'
+        'ولكل مدعو ترحيب باسمه',
+        'ومفتاح ذهبي يفتح الدعوة'
       ]
     }
   }[LANG];
@@ -243,7 +245,7 @@ body{display:grid;place-items:center;font-family:"Jost",sans-serif}
   window.addEventListener('resize', fit);
 
   // ---- the timeline (ms) ----
-  var SITES = ['midnight-gold', 'blush-heart', 'arabic-arch'];
+  var SITES = ['midnight-gold', 'blush-heart', 'arabic-arch', 'emerald-key'];
   var T = [
     { at: 0,     do: function () { show('#cardIn'); } },
     { at: 3400,  do: function () { hide('#cardIn'); load(0); } },
@@ -259,11 +261,14 @@ body{display:grid;place-items:center;font-family:"Jost",sans-serif}
     { at: 23000, do: function () { setCap(4); } },
     { at: 26500, do: function () { setCap(5); } },
 
-    { at: 29500, do: function () { clearCap(); badge.classList.remove('is-on'); phone.classList.remove('is-on'); } },
-    { at: 30300, do: function () { show('#cardOut'); } },
-    { at: 32500, do: function () { finish(); } }
+    { at: 29500, do: function () { swapTo(3); } },
+    { at: 31000, do: function () { setCap(6); } },
+
+    { at: 35500, do: function () { clearCap(); badge.classList.remove('is-on'); phone.classList.remove('is-on'); } },
+    { at: 36300, do: function () { show('#cardOut'); } },
+    { at: 38500, do: function () { finish(); } }
   ];
-  var DURATION = 32500;
+  var DURATION = 38500;
 
   function show(sel) { $(sel).classList.add('is-on'); }
   function hide(sel) { $(sel).classList.remove('is-on'); }
