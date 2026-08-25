@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&family=Italiana&family=Jost:wght@300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; min-height:100svh; display:grid; place-items:center; text-align:center; padding:32px;
+  background:radial-gradient(80% 55% at 50% 0%,#241a30 0%,transparent 60%),#0b090e;
+  color:#f3ece0; font-family:"Cormorant Garamond",serif; font-weight:300;
+}
+h1{font-family:"Italiana",serif; font-weight:400; font-size:clamp(46px,14vw,84px); margin:0 0 10px; line-height:1}
+.rule{width:70px; height:1px; margin:22px auto; background:linear-gradient(115deg,#8f6b2e,#f6e5b8 40%,#8f6b2e)}
+p{color:rgba(243,236,224,.6); font-size:18px; margin:0 0 28px}
+a{
+  display:inline-flex; align-items:center; justify-content:center; height:48px; padding:0 28px;
+  font-family:"Jost",sans-serif; font-size:10.5px; letter-spacing:.3em; text-transform:uppercase;
+  color:#f6e5b8; text-decoration:none; border:1px solid rgba(212,175,106,.42); border-radius:999px;
+  transition:background .5s cubic-bezier(.22,1,.36,1), color .5s;
+}
+a:hover{background:linear-gradient(115deg,#8f6b2e,#f6e5b8 40%,#d4af6a); color:#1a1220; border-color:transparent}
+</style>
+</head>
+<body>
+  <main>
+    <h1>404</h1>
+    <p>This page has wandered off.</p>
+    <div class="rule"></div>
+    <a href="/">Back to the designs</a>
+  </main>
+</body>
+</html>

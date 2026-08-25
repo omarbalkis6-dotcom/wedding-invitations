@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b090e">
+<title>Wedding Invitation Websites — three designs</title>
+<meta name="description" content="Three hand-built, mobile-first wedding invitation websites. Animated, self-contained, ready to personalise.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Italiana&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b090e; --ink-2:#151020; --gold:#d4af6a; --gold-lt:#f6e5b8; --cream:#f3ece0;
+  --grad-gold:linear-gradient(115deg,#8f6b2e,#f6e5b8 30%,#d4af6a 52%,#f6e5b8 70%,#8f6b2e);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; background:
+    radial-gradient(80% 50% at 50% 0%,#241a30 0%,transparent 60%),
+    radial-gradient(60% 40% at 100% 40%,rgba(201,154,154,.08),transparent 60%),
+    var(--ink);
+  color:var(--cream); font-family:"Cormorant Garamond",serif; font-weight:300;
+  font-size:17px; line-height:1.75; -webkit-font-smoothing:antialiased;
+}
+a{color:inherit; text-decoration:none}
+img{max-width:100%; display:block}
+.wrap{max-width:1100px; margin-inline:auto; padding:clamp(48px,9vw,90px) clamp(20px,6vw,44px)}
+@keyframes shimmer{to{background-position:220% 0}}
+@keyframes rise{from{opacity:0; transform:translateY(26px)} to{opacity:1; transform:none}}
+.gold{
+  background:var(--grad-gold); background-size:220% 100%;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shimmer 8s linear infinite;
+}
+header{text-align:center; animation:rise 1s var(--ease) both}
+.eyebrow{
+  font-family:"Jost",sans-serif; font-size:10.5px; letter-spacing:.42em;
+  text-transform:uppercase; margin:0 0 14px;
+}
+h1{font-family:"Italiana",serif; font-weight:400; font-size:clamp(38px,9vw,68px); line-height:1.06; margin:0 0 16px}
+.sub{max-width:620px; margin:0 auto; color:rgba(243,236,224,.62); font-size:clamp(16px,3.4vw,19px)}
+.rule{width:74px; height:1px; background:var(--grad-gold); margin:26px auto}
+
+.grid{display:grid; gap:26px; margin-top:clamp(34px,6vw,56px)}
+@media (min-width:820px){ .grid{grid-template-columns:repeat(3,1fr); gap:22px} }
+
+.card{
+  position:relative; display:flex; flex-direction:column; overflow:hidden;
+  border:1px solid rgba(212,175,106,.22); border-radius:6px;
+  background:linear-gradient(165deg,rgba(42,31,56,.6),rgba(15,11,20,.6));
+  animation:rise 1s var(--ease) both; animation-delay:var(--d,0ms);
+  transition:transform .7s var(--ease), border-color .6s, box-shadow .7s;
+}
+.card:hover{transform:translateY(-6px); border-color:rgba(212,175,106,.5); box-shadow:0 30px 56px -30px rgba(0,0,0,.9)}
+.thumb{position:relative; aspect-ratio:4/3; overflow:hidden; border-bottom:1px solid rgba(212,175,106,.18)}
+.thumb i{position:absolute; inset:0; display:block}
+.t1{background:
+  radial-gradient(40% 34% at 26% 26%,rgba(201,154,154,.5),transparent 62%),
+  radial-gradient(44% 36% at 78% 32%,rgba(212,175,106,.45),transparent 64%),
+  linear-gradient(160deg,#2a1f38,#0f0b14)}
+.t2{background:
+  radial-gradient(42% 34% at 28% 26%,rgba(240,174,178,.85),transparent 64%),
+  radial-gradient(40% 32% at 76% 34%,rgba(247,223,224,.95),transparent 66%),
+  linear-gradient(160deg,#fdf7f4,#f3d9d8)}
+.t3{background:
+  radial-gradient(46% 36% at 30% 24%,#fffdf8,transparent 64%),
+  radial-gradient(40% 32% at 76% 36%,#f6edda,transparent 66%),
+  linear-gradient(160deg,#ffffff,#efe4d0)}
+.mark{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  font-family:"Italiana",serif; font-size:clamp(30px,6vw,40px); letter-spacing:.06em;
+}
+.m1{color:#f6e5b8}
+.m2{color:#b06a72}
+.m3{color:#a3813f; font-family:"Cormorant Garamond",serif}
+
+.body{padding:24px 22px 26px; display:flex; flex-direction:column; flex:1}
+.tag{
+  font-family:"Jost",sans-serif; font-size:9.5px; letter-spacing:.34em;
+  text-transform:uppercase; color:var(--gold); margin:0 0 8px;
+}
+h2{font-family:"Italiana",serif; font-weight:400; font-size:27px; margin:0 0 10px}
+.desc{margin:0 0 18px; color:rgba(243,236,224,.6); font-size:15.5px; line-height:1.7; flex:1}
+.meta{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 20px; padding:0; list-style:none}
+.meta li{
+  font-family:"Jost",sans-serif; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(243,236,224,.55); border:1px solid rgba(212,175,106,.22);
+  border-radius:999px; padding:5px 10px;
+}
+.btn{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  height:48px; overflow:hidden; isolation:isolate;
+  font-family:"Jost",sans-serif; font-size:10.5px; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--gold-lt); border:1px solid rgba(212,175,106,.42); border-radius:999px;
+  transition:color .5s var(--ease), border-color .5s;
+}
+.btn span{position:relative; z-index:2}
+.btn::before{content:""; position:absolute; inset:0; z-index:1; background:var(--grad-gold); transform:translateY(101%); transition:transform .6s var(--ease)}
+.btn:hover{color:#1a1220; border-color:transparent}
+.btn:hover::before{transform:translateY(0)}
+
+.note{
+  margin-top:clamp(40px,7vw,64px); padding:26px 24px; border-radius:6px;
+  border:1px solid rgba(212,175,106,.18); background:rgba(20,14,26,.5);
+  animation:rise 1s .5s var(--ease) both;
+}
+.note h3{font-family:"Italiana",serif; font-weight:400; font-size:22px; margin:0 0 10px}
+.note ul{margin:0; padding-inline-start:20px; color:rgba(243,236,224,.62); font-size:15.5px}
+.note li{margin-bottom:6px}
+footer{text-align:center; padding:0 0 60px; font-family:"Jost",sans-serif; font-size:9.5px; letter-spacing:.34em; text-transform:uppercase; color:rgba(243,236,224,.28)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow gold">Wedding invitation websites</p>
+    <h1>Three Designs,<br>One Unforgettable Day</h1>
+    <div class="rule"></div>
+    <p class="sub">Hand-built, mobile-first invitation sites with an opening animation, live countdown, photo gallery, RSVP and ambient sound. Each one is a single file — personalise the names and it is ready to send.</p>
+  </header>
+
+  <div class="grid">
+
+    <article class="card" style="--d:120ms">
+      <div class="thumb"><i class="t1"></i><span class="mark m1">A &amp; S</span></div>
+      <div class="body">
+        <p class="tag">Design One</p>
+        <h2>Midnight Gold</h2>
+        <p class="desc">A dark jewel-box invitation. A wax-sealed envelope opens into plum and champagne gold, with drifting petals and engraved filigree.</p>
+        <ul class="meta"><li>Envelope opening</li><li>Petals</li><li>Timeline</li><li>English</li></ul>
+        <a class="btn" href="midnight-gold/"><span>View demo</span></a>
+      </div>
+    </article>
+
+    <article class="card" style="--d:240ms">
+      <div class="thumb"><i class="t2"></i><span class="mark m2">A &amp; S</span></div>
+      <div class="body">
+        <p class="tag">Design Two</p>
+        <h2>Blush Heart</h2>
+        <p class="desc">Light, airy and romantic. A heart locket splits open, and every frame on the page — portraits, gallery, swatches — is cut from the same heart.</p>
+        <ul class="meta"><li>Heart locket</li><li>Tap bursts</li><li>Heartbeat</li><li>English</li></ul>
+        <a class="btn" href="blush-heart/"><span>View demo</span></a>
+      </div>
+    </article>
+
+    <article class="card" style="--d:360ms">
+      <div class="thumb"><i class="t3"></i><span class="mark m3">آية و أحمد</span></div>
+      <div class="body">
+        <p class="tag">Design Three</p>
+        <h2>Arabic Arch</h2>
+        <p class="desc">White and gold, fully Arabic and right-to-left. Carved doors open on a pointed-arch invitation with real photography and Arabic-Indic numerals.</p>
+        <ul class="meta"><li>Arabic RTL</li><li>Carved doors</li><li>Photography</li><li>عربي</li></ul>
+        <a class="btn" href="arabic-arch/"><span>View demo</span></a>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="note">
+    <h3>What every design includes</h3>
+    <ul>
+      <li>Opening animation, live countdown and one-tap “save the date” calendar file</li>
+      <li>Photo gallery with lightbox, RSVP form and a wishes wall</li>
+      <li>Personalised greeting — add <b>?to=Guest%20Name</b> to the link and it greets them by name</li>
+      <li>Ambient music generated in the browser, so there is no audio file to host</li>
+      <li>Built mobile-first, works offline, and respects reduced-motion settings</li>
+    </ul>
+  </div>
+</div>
+
+<footer>three designs · one file each · ready to personalise</footer>
+
+</body>
+</html>
