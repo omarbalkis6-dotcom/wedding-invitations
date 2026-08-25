@@ -914,7 +914,20 @@ a{color:inherit; text-decoration:none}
     date: new Date(2026, 10, 14, 17, 0, 0),     // ١٤ نوفمبر ٢٠٢٦ — ٥:٠٠ عصراً
     endDate: new Date(2026, 10, 14, 23, 0, 0),
     venue: 'قاعة قصر اللؤلؤة، طريق الملك عبدالله',
-    defaultGuest: 'الأهل والأحبة'
+    defaultGuest: 'الأهل والأحبة',
+
+    /* ---- WHERE RSVPs GO -------------------------------------------------
+       A static page cannot store replies centrally, so each reply is handed
+       to a channel the couple actually watches. Fill in ONE of these.
+
+       1) WhatsApp — no account, no setup. Host's number in international
+          format, digits only (no + and no spaces):                        */
+    rsvpWhatsApp: '',        // e.g. '966501234567'
+    /*  2) Or a form endpoint (Formspree, Getform, your own API). Replies
+           arrive by email or in a dashboard, nothing for the guest to do:  */
+    rsvpEndpoint: ''         // e.g. 'https://formspree.io/f/xxxxxxxx'
+    /* With both empty, a reply is only kept in that guest's own browser —
+       fine for a demo, but the couple never sees it.                      */
   };
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
@@ -1168,6 +1181,63 @@ a{color:inherit; text-decoration:none}
       });
     }
 
+
+    /* ---- إيصال الرد إلى أهل العروسين ---------------------------- */
+    function messageFor(e) {
+      return [
+        'تأكيد حضور — ' + CONFIG.bride + ' و ' + CONFIG.groom,
+        'الاسم: ' + e.name,
+        e.att === 'yes' ? 'الحضور: سأحضر بإذن الله' : 'الحضور: أعتذر',
+        e.att === 'yes' ? 'عدد الأشخاص: ' + e.guests : '',
+        e.wish ? 'رسالة: ' + e.wish : ''
+      ].filter(Boolean).join('\n');
+    }
+
+    var fallback = null;
+    function showFallback(url) {
+      if (!fallback) {
+        fallback = document.createElement('a');
+        fallback.className = 'btn btn--fill';
+        fallback.target = '_blank';
+        fallback.rel = 'noopener';
+        fallback.style.marginTop = '14px';
+        fallback.innerHTML = '<span>اضغط لإرسال ردك</span>';
+        note.parentNode.insertBefore(fallback, note.nextSibling);
+      }
+      fallback.href = url;
+      fallback.hidden = false;
+    }
+
+    // returns true when the reply was actually sent somewhere
+    function deliver(entry) {
+      var sent = false;
+
+      if (CONFIG.rsvpEndpoint) {
+        sent = true;
+        try {
+          fetch(CONFIG.rsvpEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(entry)
+          }).catch(function () {});
+        } catch (err) {}
+      }
+
+      if (CONFIG.rsvpWhatsApp) {
+        sent = true;
+        var url = 'https://wa.me/' + String(CONFIG.rsvpWhatsApp).replace(/\D/g, '') +
+                  '?text=' + encodeURIComponent(messageFor(entry));
+        var w = window.open(url, '_blank');
+        if (!w) showFallback(url);          // popup blocked — offer a tap instead
+      }
+
+      if (!sent && window.console) {
+        console.warn('[RSVP] Saved locally only. Set CONFIG.rsvpWhatsApp or ' +
+                     'CONFIG.rsvpEndpoint so replies reach the couple.');
+      }
+      return sent;
+    }
+
     form.addEventListener('change', function (e) {
       if (e.target.name !== 'att') return;
       guestsField.classList.toggle('is-hidden', e.target.value === 'no');
@@ -1192,10 +1262,12 @@ a{color:inherit; text-decoration:none}
       };
       var all = load(); all.push(entry); save(all); render();
 
+      var sent = deliver(entry);   // إيصال الرد إلى أهل العروسين
+
       note.classList.remove('is-err');
       note.textContent = att === 'yes'
-        ? 'شكراً لكم — تم حجز مقعد باسمكم'
-        : 'شكراً لكم — سنفتقد وجودكم';
+        ? (sent ? 'شكراً لكم — جارٍ إرسال تأكيد حضوركم' : 'شكراً لكم — تم حجز مقعد باسمكم')
+        : (sent ? 'شكراً لكم — جارٍ إرسال ردكم' : 'شكراً لكم — سنفتقد وجودكم');
       note.classList.add('is-on');
       chime();
 

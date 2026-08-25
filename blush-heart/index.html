@@ -1088,7 +1088,20 @@ a{color:inherit; text-decoration:none}
     date: new Date(2026, 10, 14, 9, 0, 0),     // 14 Nov 2026, 09:00
     endDate: new Date(2026, 10, 14, 22, 0, 0),
     venue: 'Villa Belvedere Gardens, Via Terrazza 4, Ravello SA, Italy',
-    defaultGuest: 'Beloved Guest'
+    defaultGuest: 'Beloved Guest',
+
+    /* ---- WHERE RSVPs GO -------------------------------------------------
+       A static page cannot store replies centrally, so each reply is handed
+       to a channel the couple actually watches. Fill in ONE of these.
+
+       1) WhatsApp — no account, no setup. Host's number in international
+          format, digits only (no + and no spaces):                        */
+    rsvpWhatsApp: '',        // e.g. '966501234567'
+    /*  2) Or a form endpoint (Formspree, Getform, your own API). Replies
+           arrive by email or in a dashboard, nothing for the guest to do:  */
+    rsvpEndpoint: ''         // e.g. 'https://formspree.io/f/xxxxxxxx'
+    /* With both empty, a reply is only kept in that guest's own browser —
+       fine for a demo, but the couple never sees it.                      */
   };
 
   var $  = function (s, c) { return (c || document).querySelector(s); };
@@ -1367,6 +1380,63 @@ a{color:inherit; text-decoration:none}
       });
     }
 
+
+    /* ---- delivering the reply to the couple ---------------------------- */
+    function messageFor(e) {
+      return [
+        'RSVP — ' + CONFIG.bride + ' & ' + CONFIG.groom,
+        'Name: ' + e.name,
+        e.att === 'yes' ? 'Attending: YES' : 'Attending: NO',
+        e.att === 'yes' ? 'Guests: ' + e.guests : '',
+        e.wish ? 'Message: ' + e.wish : ''
+      ].filter(Boolean).join('\n');
+    }
+
+    var fallback = null;
+    function showFallback(url) {
+      if (!fallback) {
+        fallback = document.createElement('a');
+        fallback.className = 'btn btn--fill';
+        fallback.target = '_blank';
+        fallback.rel = 'noopener';
+        fallback.style.marginTop = '14px';
+        fallback.innerHTML = '<span>Tap to send your reply</span>';
+        note.parentNode.insertBefore(fallback, note.nextSibling);
+      }
+      fallback.href = url;
+      fallback.hidden = false;
+    }
+
+    // returns true when the reply was actually sent somewhere
+    function deliver(entry) {
+      var sent = false;
+
+      if (CONFIG.rsvpEndpoint) {
+        sent = true;
+        try {
+          fetch(CONFIG.rsvpEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(entry)
+          }).catch(function () {});
+        } catch (err) {}
+      }
+
+      if (CONFIG.rsvpWhatsApp) {
+        sent = true;
+        var url = 'https://wa.me/' + String(CONFIG.rsvpWhatsApp).replace(/\D/g, '') +
+                  '?text=' + encodeURIComponent(messageFor(entry));
+        var w = window.open(url, '_blank');
+        if (!w) showFallback(url);          // popup blocked — offer a tap instead
+      }
+
+      if (!sent && window.console) {
+        console.warn('[RSVP] Saved locally only. Set CONFIG.rsvpWhatsApp or ' +
+                     'CONFIG.rsvpEndpoint so replies reach the couple.');
+      }
+      return sent;
+    }
+
     form.addEventListener('change', function (e) {
       if (e.target.name !== 'att') return;
       guestsField.classList.toggle('is-hidden', e.target.value === 'no');
@@ -1391,10 +1461,14 @@ a{color:inherit; text-decoration:none}
       };
       var all = load(); all.push(entry); save(all); render();
 
+      var sent = deliver(entry);   // hand the reply to the couple
+
       note.classList.remove('is-err');
       note.textContent = att === 'yes'
-        ? 'Thank you — a seat is being saved for you.'
-        : 'Thank you — you will be missed dearly.';
+        ? (sent ? 'Thank you — your acceptance is on its way to us.'
+                : 'Thank you — a seat is being saved for you.')
+        : (sent ? 'Thank you — your reply is on its way to us.'
+                : 'Thank you — you will be missed dearly.');
       note.classList.add('is-on');
 
       var r = $('#sendBtn').getBoundingClientRect();
