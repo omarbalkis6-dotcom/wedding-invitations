@@ -1762,19 +1762,22 @@ a{color:inherit; text-decoration:none}
     setTimeout(function () { openInvitation(); }, 1400);
 
     setTimeout(function () {
-      var start = null;
+      var start = Date.now();
       function maxScroll() {
         return Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       }
-      function step(t) {
-        if (start === null) start = t;
-        var p = Math.min(1, (t - start) / (secs * 1000));
+      function tick() {
+        var p = Math.min(1, (Date.now() - start) / (secs * 1000));
         // ease-in-out so the drift starts and ends gently
         var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
         window.scrollTo(0, maxScroll() * e);
-        if (p < 1) requestAnimationFrame(step);
+        // scroll events are frame-tied too, so reveal content directly rather
+        // than waiting for a listener that may never fire while filming
+        if (typeof sweep === 'function') sweep();
+        if (p >= 1) clearInterval(timer);
       }
-      requestAnimationFrame(step);
+      var timer = setInterval(tick, 33);   // ~30fps, survives rAF throttling
+      tick();
     }, 4200);
   })();
 })();
