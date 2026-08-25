@@ -922,7 +922,7 @@ a{color:inherit; text-decoration:none}
 
        1) WhatsApp — no account, no setup. Host's number in international
           format, digits only (no + and no spaces):                        */
-    rsvpWhatsApp: '',        // e.g. '966501234567'
+    rsvpWhatsApp: '96176639001',        // e.g. '966501234567'
     /*  2) Or a form endpoint (Formspree, Getform, your own API). Replies
            arrive by email or in a dashboard, nothing for the guest to do:  */
     rsvpEndpoint: ''         // e.g. 'https://formspree.io/f/xxxxxxxx'
@@ -1201,7 +1201,7 @@ a{color:inherit; text-decoration:none}
         fallback.target = '_blank';
         fallback.rel = 'noopener';
         fallback.style.marginTop = '14px';
-        fallback.innerHTML = '<span>اضغط لإرسال ردك</span>';
+        fallback.innerHTML = '<span>أرسل ردك عبر واتساب</span>';
         note.parentNode.insertBefore(fallback, note.nextSibling);
       }
       fallback.href = url;
@@ -1227,8 +1227,9 @@ a{color:inherit; text-decoration:none}
         sent = true;
         var url = 'https://wa.me/' + String(CONFIG.rsvpWhatsApp).replace(/\D/g, '') +
                   '?text=' + encodeURIComponent(messageFor(entry));
-        var w = window.open(url, '_blank');
-        if (!w) showFallback(url);          // popup blocked — offer a tap instead
+        showFallback(url);   // keep it tappable even if the popup is closed
+        window.open(url, '_blank');
+        sent = 'wa';
       }
 
       if (!sent && window.console) {
@@ -1266,7 +1267,7 @@ a{color:inherit; text-decoration:none}
 
       note.classList.remove('is-err');
       note.textContent = att === 'yes'
-        ? (sent ? 'شكراً لكم — جارٍ إرسال تأكيد حضوركم' : 'شكراً لكم — تم حجز مقعد باسمكم')
+        ? (sent === 'wa' ? 'بقيت خطوة — اضغط إرسال في واتساب لتأكيد حضوركم' : sent ? 'شكراً لكم — جارٍ إرسال تأكيد حضوركم' : 'شكراً لكم — تم حجز مقعد باسمكم')
         : (sent ? 'شكراً لكم — جارٍ إرسال ردكم' : 'شكراً لكم — سنفتقد وجودكم');
       note.classList.add('is-on');
       chime();
