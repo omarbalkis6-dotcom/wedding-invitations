@@ -816,6 +816,119 @@ a{color:inherit; text-decoration:none}
 }
 .intro__rule svg{width:min(280px,72vw); height:40px}
 
+/* =====================================================================
+   13. THE STAIRCASE — climbs out of the opened envelope
+   ===================================================================== */
+.stairs{
+  position:fixed; inset:0; z-index:145; overflow:hidden;
+  opacity:0; visibility:hidden; pointer-events:none;
+  background:var(--ink);
+  transition:opacity 1s var(--ease), visibility 1s;
+}
+.stairs.is-on{opacity:1; visibility:visible}
+.stairs.is-out{opacity:0}
+
+/* warm light pooling at the top of the flight */
+.stairs__sky{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(46% 34% at 50% 22%,rgba(246,229,184,.42),transparent 66%),
+    radial-gradient(70% 50% at 50% 12%,rgba(138,98,71,.5),transparent 72%),
+    linear-gradient(180deg,#54392a 0%,#3b2a20 42%,#1a1210 100%);
+}
+.stairs__petals{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:4}
+
+.stairs__scene{
+  position:absolute; inset:0;
+  perspective:820px; perspective-origin:50% 42%;
+  z-index:2;
+}
+.stairs__flight{
+  position:absolute; left:0; right:0; top:52%;
+  transform-style:preserve-3d;
+  transform:translate3d(0,240px,-1500px);
+}
+.stairs.is-on .stairs__flight{animation:climb 6.4s var(--ease-soft) forwards}
+@keyframes climb{
+  0%   {transform:translate3d(0,240px,-1500px)}
+  100% {transform:translate3d(0,-300px,340px)}
+}
+
+/* one tread */
+.step{
+  position:absolute; left:50%; width:min(420px,86vw); height:30px;
+  margin-left:calc(min(420px,86vw) / -2);
+  transform:translate3d(0,var(--y),var(--z)) rotateX(74deg);
+  transform-style:preserve-3d;
+  background:linear-gradient(180deg,#8a6247,#54392a 60%,#3b2a20);
+  border-top:1px solid rgba(246,229,184,.65);
+  box-shadow:0 18px 30px rgba(0,0,0,.55);
+  opacity:0;
+  animation:stepIn .7s var(--back) forwards;
+  animation-delay:var(--sd,0ms);
+}
+/* the riser below each tread */
+.step::after{
+  content:""; position:absolute; left:0; right:0; top:100%; height:44px;
+  background:linear-gradient(180deg,#4a3324,#2a1d16);
+  transform-origin:top center; transform:rotateX(-74deg);
+  border-top:1px solid rgba(212,175,106,.22);
+}
+/* a runner down the middle */
+.step::before{
+  content:""; position:absolute; left:24%; right:24%; top:0; bottom:0; z-index:2;
+  background:linear-gradient(180deg,rgba(199,142,120,.75),rgba(150,92,72,.6));
+  box-shadow:inset 0 0 0 1px rgba(246,229,184,.25);
+}
+@keyframes stepIn{to{opacity:1}}
+
+/* the letter waiting at the top */
+.portal{
+  position:absolute; left:50%; top:12%; z-index:3;
+  width:min(300px,74vw); aspect-ratio:1/1.34;
+  transform:translate(-50%,0) scale(.24);
+  opacity:0;
+}
+.stairs.is-on .portal{animation:portalRise 3.4s 3.4s var(--ease) forwards}
+@keyframes portalRise{
+  0%   {opacity:0; transform:translate(-50%,0) scale(.24)}
+  35%  {opacity:1}
+  100% {opacity:1; transform:translate(-50%,6%) scale(1)}
+}
+.portal__glow{
+  position:absolute; inset:-30%; border-radius:50%;
+  background:radial-gradient(circle,rgba(246,229,184,.55),transparent 62%);
+  filter:blur(16px); animation:breathe 4s ease-in-out infinite;
+}
+.portal__card{
+  position:absolute; inset:0; display:grid; place-content:center; gap:8px;
+  background:linear-gradient(180deg,#f7f2e7,#e7dcc7);
+  border-radius:4px; box-shadow:0 30px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(212,175,106,.7);
+  padding:8%;
+}
+.portal__bloom{width:38px; height:38px; margin:0 auto 4px; display:block; opacity:.85}
+.portal__mono{
+  font-family:var(--f-name); font-size:clamp(24px,6vw,34px); line-height:1.9; color:#3b2a20;
+  display:flex; align-items:center; justify-content:center; gap:8px; text-align:center;
+}
+.portal__mono i{font-family:var(--f-head); font-style:normal; font-size:.62em; color:var(--gold-dk)}
+.portal__date{
+  font-family:var(--f-ui); font-size:12px; letter-spacing:.22em;
+  color:rgba(59,42,32,.65); text-align:center;
+}
+.portal__note{
+  font-family:var(--f-head); font-size:13px; color:var(--gold-dk); text-align:center; margin-top:2px;
+}
+
+.stairs__cap{
+  position:absolute; left:0; right:0; bottom:9%; z-index:5; text-align:center; margin:0;
+  font-family:var(--f-head); font-size:clamp(15px,4vw,20px); color:var(--gold-lt);
+  text-shadow:0 6px 20px rgba(0,0,0,.7);
+  opacity:0; animation:fadeUp 1.2s .8s var(--ease) forwards;
+}
+.stairs__cap.is-done{animation:fadeOut .8s var(--ease) forwards}
+@keyframes fadeOut{to{opacity:0}}
+
 </style>
 
 </head>
@@ -993,6 +1106,30 @@ a{color:inherit; text-decoration:none}
   </div>
 </section>
 
+
+
+<!-- ============ THE STAIRCASE ============ -->
+<section class="stairs" id="stairs" aria-hidden="true">
+  <div class="stairs__sky"></div>
+  <canvas class="stairs__petals" id="stairPetals"></canvas>
+
+  <div class="stairs__scene">
+    <div class="stairs__flight" id="flight"><!-- steps built in script --></div>
+
+    <!-- what was inside the envelope, waiting at the top -->
+    <div class="portal" id="portal">
+      <div class="portal__glow"></div>
+      <div class="portal__card">
+        <svg class="portal__bloom" viewBox="0 0 100 100"><use href="#orn-bloom"/></svg>
+        <span class="portal__mono">ليلى<i>&amp;</i>يوسف</span>
+        <span class="portal__date">١٢ . ٠٦ . ٢٠٢٧</span>
+        <span class="portal__note">دعوة زفاف</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="stairs__cap" id="stairsCap">اصعد معنا…</p>
+</section>
 
 <!-- ============ THE COUPLE, WALKING ============ -->
 <section class="intro" id="intro" aria-hidden="true">
@@ -1407,14 +1544,51 @@ a{color:inherit; text-decoration:none}
     finish(3300);
   }
 
-  // envelope opens -> the couple walking -> the invitation itself
-  var INTRO_MS = 6200;
+  // envelope opens -> stairs -> the letter at the top -> the couple -> the page
+  var STAIRS_MS = 7200;
+  var INTRO_MS  = 4800;
+  var STEPS     = 13;
 
   function finish(delay) {
     setTimeout(function () {
       gate && gate.classList.add('is-open');
-      showIntro();
+      showStairs();
     }, delay);
+  }
+
+  // a flight of stairs, built one tread at a time
+  function showStairs() {
+    var st = $('#stairs'), flight = $('#flight');
+    if (!st || !flight || reduced) { showIntro(); return; }
+
+    flight.innerHTML = '';
+    for (var i = 0; i < STEPS; i++) {
+      var step = document.createElement('div');
+      step.className = 'step';
+      step.style.setProperty('--y', (-i * 46) + 'px');   // each one higher
+      step.style.setProperty('--z', (-i * 168) + 'px');  // and further away
+      step.style.setProperty('--sd', (i * 105) + 'ms');  // and arriving later
+      step.style.zIndex = String(STEPS - i);
+      flight.appendChild(step);
+    }
+
+    st.classList.add('is-on');
+    stairPetals();
+    setTimeout(function () { var c = $('#stairsCap'); if (c) c.classList.add('is-done'); }, 4200);
+
+    setTimeout(function () {
+      st.classList.add('is-out');
+      showIntro();
+    }, STAIRS_MS);
+    setTimeout(function () {
+      st.classList.remove('is-on', 'is-out');
+      st.style.display = 'none';
+    }, STAIRS_MS + 1200);
+  }
+
+  // petals falling down the stairwell
+  function stairPetals() {
+    drift($('#stairPetals'), STAIRS_MS + 1200, 22);
   }
 
   function showIntro() {
@@ -1440,15 +1614,21 @@ a{color:inherit; text-decoration:none}
 
   // petals drifting across the couple
   function introPetals() {
-    var cv = $('#introPetals');
+    drift($('#introPetals'), INTRO_MS + 1200, 26);
+  }
+
+  // shared: soft petals over a full-screen scene, for a fixed lifetime
+  function drift(cv, lifeMs, count) {
     if (!cv || reduced) return;
     var ctx = cv.getContext('2d');
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
-    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+    var vw = innerWidth || document.documentElement.clientWidth || 360;
+    var vh = innerHeight || document.documentElement.clientHeight || 640;
+    var W = cv.width = vw * dpr, H = cv.height = vh * dpr;
+    cv.style.width = vw + 'px'; cv.style.height = vh + 'px';
     var TINTS = ['rgba(240,206,180,', 'rgba(226,178,150,', 'rgba(212,175,106,'];
     var ps = [];
-    for (var i = 0; i < 26; i++) {
+    for (var i = 0; i < count; i++) {
       ps.push({
         x: Math.random() * W, y: Math.random() * H,
         r: (Math.random() * 9 + 6) * dpr,
@@ -1461,7 +1641,7 @@ a{color:inherit; text-decoration:none}
       });
     }
     var stop = false;
-    setTimeout(function () { stop = true; }, INTRO_MS + 1200);
+    setTimeout(function () { stop = true; }, lifeMs);
     (function frame() {
       if (stop) return;
       ctx.clearRect(0, 0, W, H);
@@ -1964,7 +2144,7 @@ a{color:inherit; text-decoration:none}
       }
       var timer = setInterval(step, 33);   // a timer survives rAF throttling
       step();
-    }, 11800);
+    }, 16800);
   })();
 })();
 
